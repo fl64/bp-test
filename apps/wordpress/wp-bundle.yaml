@@ -1,0 +1,220 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wordpress
+---
+# Source: wordpress/templates/externaldb-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wordpress-externaldb
+type: Opaque
+data:
+  mariadb-password: "d29yZHByZXNz"
+---
+# Source: wordpress/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wordpress
+type: Opaque
+data:
+  wordpress-password: "cGFzc3dvcmQ="
+---
+# Source: wordpress/templates/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: wordpress
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "10Gi"
+  storageClassName: standard
+---
+# Source: wordpress/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: "Cluster"
+  sessionAffinity: None
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+---
+# Source: wordpress/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+spec:
+  strategy:
+    rollingUpdate: {}
+    type: RollingUpdate
+  replicas: 1
+  template:
+    spec:
+      # yamllint disable rule:indentation
+      hostAliases:
+        - hostnames:
+          - status.localhost
+          ip: 127.0.0.1
+      # yamllint enable rule:indentation
+      securityContext:
+        fsGroup: 1001
+      serviceAccountName: default
+      containers:
+        - name: wordpress
+          image: docker.io/bitnami/wordpress:6.0.0-debian-11-r7
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+            - name: MARIADB_HOST
+              value: "mysql.database.svc.cluster.local"
+            - name: MARIADB_PORT_NUMBER
+              value: "3306"
+            - name: WORDPRESS_DATABASE_NAME
+              value: "wp1"
+            - name: WORDPRESS_DATABASE_USER
+              value: "wp1"
+            - name: WORDPRESS_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wordpress-externaldb
+                  key: mariadb-password
+            - name: WORDPRESS_USERNAME
+              value: "user"
+            - name: WORDPRESS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wordpress
+                  key: wordpress-password
+            - name: WORDPRESS_EMAIL
+              value: "user@example.com"
+            - name: WORDPRESS_FIRST_NAME
+              value: "FirstName"
+            - name: WORDPRESS_LAST_NAME
+              value: "LastName"
+            - name: WORDPRESS_HTACCESS_OVERRIDE_NONE
+              value: "no"
+            - name: WORDPRESS_ENABLE_HTACCESS_PERSISTENCE
+              value: "no"
+            - name: WORDPRESS_BLOG_NAME
+              value: "User's Blog!"
+            - name: WORDPRESS_SKIP_BOOTSTRAP
+              value: "no"
+            - name: WORDPRESS_TABLE_PREFIX
+              value: "wp_"
+            - name: WORDPRESS_SCHEME
+              value: "http"
+            - name: WORDPRESS_EXTRA_WP_CONFIG_CONTENT
+              value: ""
+            - name: WORDPRESS_PLUGINS
+              value: "none"
+            - name: APACHE_HTTP_PORT_NUMBER
+              value: "8080"
+            - name: APACHE_HTTPS_PORT_NUMBER
+              value: "8443"
+          envFrom:
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: https
+              containerPort: 8443
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              httpHeaders: []
+              path: /wp-admin/install.php
+              port: 'http'
+              scheme: 'HTTP'
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              httpHeaders: []
+              path: /wp-login.php
+              port: 'http'
+              scheme: 'HTTP'
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits: {}
+            requests:
+              cpu: 300m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /bitnami/wordpress
+              name: wordpress-data
+              subPath: wordpress
+      volumes:
+        - name: wordpress-data
+          persistentVolumeClaim:
+            claimName: wordpress
+---
+# Source: wordpress/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wordpress
+spec:
+  rules:
+    - host: "wp01.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: wordpress
+                port:
+                  name: http
+---
+# Source: wordpress/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: wordpress
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: wordpress
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 90
