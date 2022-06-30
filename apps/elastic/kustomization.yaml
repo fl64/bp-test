@@ -4,8 +4,10 @@ kind: Kustomization
 namespace: elk
 
 commonLabels:
-    app.kubernetes.io/name: elastic-search
+    app.kubernetes.io/name: elastic-cluster
     app.kubernetes.io/managed-by:  Kustomize
 
 resources:
-- es-bundle.yaml
+- ns.yaml
+- ./elasticsearch
+- ./kibana

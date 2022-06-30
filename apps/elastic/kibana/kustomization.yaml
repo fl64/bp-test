@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+    app.kubernetes.io/component: kibana
+
+resources:
+- kibana-bundle.yaml
+
+configMapGenerator:
+  - name: kibana-conf
+    files:
+      - kibana.yml=cfg/kibana.yml
