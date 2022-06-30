@@ -20,3 +20,11 @@
 - `make delete` - delete minikube
 - `make hosts` - show settings to add to /etc/hosts
 - `make help` - show help (default)
+
+
+## Secrets
+
+```
+kubeseal --format yaml --scope cluster-wide --cert secrets/sealedsecrets.crt < apps/mysql/secret.yaml > apps/mysql/sealed-secrets.yaml
+
+```

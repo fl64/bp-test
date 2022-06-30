@@ -10,6 +10,19 @@ commonLabels:
 
 resources:
   - mysql-bundle.yaml
+  - sealed-secrets.yaml
+
+configurations:
+  - sealed-secret-config.yaml
+
+# generatorOptions:
+#   annotations:
+#     sealedsecrets.bitnami.com/managed: "true"
+#     sealedsecrets.bitnami.com/namespace-wide: "true"
+
+# secretGenerator:
+#   - name: mysql
+#     type: Opaque
 
 configMapGenerator:
   - name: mysql

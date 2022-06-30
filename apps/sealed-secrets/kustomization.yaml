@@ -6,6 +6,7 @@ namespace: kube-system
 
 resources:
   - https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.18.0/controller.yaml
+  - secret.yaml
 
 patchesStrategicMerge:
   - deploy.patch.yaml

@@ -6,6 +6,7 @@ namespace: client-a
 
 resources:
   - ../../base
+  - secrets.yaml
 
 images:
   - name: docker.io/bitnami/wordpress

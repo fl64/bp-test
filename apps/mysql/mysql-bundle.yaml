@@ -13,17 +13,6 @@ automountServiceAccountToken: true
 secrets:
   - name: mysql
 ---
-# Source: mysql/templates/secrets.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mysql
-type: Opaque
-data:
-  mysql-root-password: "cGFzc3dvcmQ="
-  wp1-pass: "d29yZHByZXNz"
-  wp2-pass: "d29yZHByZXNz"
----
 # Source: mysql/templates/primary/svc-headless.yaml
 apiVersion: v1
 kind: Service
