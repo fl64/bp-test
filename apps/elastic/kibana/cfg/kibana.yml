@@ -1,3 +1,4 @@
+---
 pid.file: /opt/bitnami/kibana/tmp/kibana.pid
 server.host: "::"
 server.port: 5601

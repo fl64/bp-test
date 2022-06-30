@@ -1,4 +1,4 @@
-.PHONY: start stop delete deploy undeploy hosts
+.PHONY: start stop delete deploy undeploy hosts lint
 
 minikube_ip := $(shell minikube ip)
 default: help;
@@ -11,6 +11,7 @@ help:
 	@echo "delete - delete minikube"
 	@echo "hosts - show settings to add to /etc/hosts"
 	@echo "help - show help (default)"
+	@echo "lint - run yamllint"
 
 
 start:
@@ -37,3 +38,6 @@ hosts:
 	@echo $(minikube_ip) kibana.example.com
 	@echo $(minikube_ip) wp01.example.com
 	@echo $(minikube_ip) wp02.example.com
+
+lint:
+	@docker run --rm $$(tty -s && echo "-it" || echo) -v $(PWD):/data cytopia/yamllint:latest .

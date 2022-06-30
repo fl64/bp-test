@@ -21,7 +21,6 @@ metadata:
 type: Opaque
 data:
   mysql-root-password: "cGFzc3dvcmQ="
-  #mysql-password: "d29yZHByZXNz"
   wp1-pass: "d29yZHByZXNz"
   wp2-pass: "d29yZHByZXNz"
 ---

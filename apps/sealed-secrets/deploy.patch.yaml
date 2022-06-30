@@ -1,0 +1,14 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sealed-secrets-controller
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      containers:
+        - args:
+            - --key-renew-period=0
+            - --update-status
+          name: sealed-secrets-controller
