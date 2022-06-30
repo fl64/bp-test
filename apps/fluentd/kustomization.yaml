@@ -4,8 +4,16 @@ kind: Kustomization
 namespace: fluentd
 
 commonLabels:
-    app.kubernetes.io/name: fluentd
-    app.kubernetes.io/managed-by:  Kustomize
+  app.kubernetes.io/name: fluentd
+  app.kubernetes.io/managed-by: Kustomize
 
 resources:
-- fluentd-bundle.yaml
+  - fluentd-bundle.yaml
+
+configMapGenerator:
+  - name: fluentd
+    files:
+      - fluentd-inputs.conf=cfg/fluentd-inputs.conf
+      - fluentd-output.conf=cfg/fluentd-output.conf
+      - fluentd.conf=cfg/fluentd.conf
+      - metrics.conf=cfg/metrics.conf
