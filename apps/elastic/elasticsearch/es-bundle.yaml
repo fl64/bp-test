@@ -49,6 +49,27 @@ spec:
       serviceAccountName: default
       securityContext:
         fsGroup: 1001
+      initContainers:
+        ## Image that performs the sysctl operation to modify Kernel settings (needed sometimes to avoid boot errors)
+        - name: sysctl
+          image: docker.io/bitnami/bitnami-shell:11-debian-11-r6
+          imagePullPolicy: "IfNotPresent"
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              CURRENT=`sysctl -n vm.max_map_count`;
+              DESIRED="262144";
+              if [ "$DESIRED" -gt "$CURRENT" ]; then
+                  sysctl -w vm.max_map_count=262144;
+              fi;
+              CURRENT=`sysctl -n fs.file-max`;
+              DESIRED="65536";
+              if [ "$DESIRED" -gt "$CURRENT" ]; then
+                  sysctl -w fs.file-max=65536;
+              fi;
+          securityContext:
+            privileged: true
       containers:
         - name: elasticsearch
           image: docker.io/bitnami/elasticsearch:8.2.3-debian-11-r2
