@@ -11,7 +11,7 @@ metadata:
   name: wordpress-externaldb
 type: Opaque
 data:
-  mariadb-password: "d29yZHByZXNz"
+  mariadb-password: ""
 ---
 # Source: wordpress/templates/secrets.yaml
 apiVersion: v1
@@ -20,7 +20,7 @@ metadata:
   name: wordpress
 type: Opaque
 data:
-  wordpress-password: "cGFzc3dvcmQ="
+  wordpress-password: ""
 ---
 # Source: wordpress/templates/pvc.yaml
 kind: PersistentVolumeClaim

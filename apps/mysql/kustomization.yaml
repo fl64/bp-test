@@ -18,3 +18,11 @@ configMapGenerator:
   - name: bootstrap
     files:
       - bootstrap.sh=cfg/bootstrap.sh
+
+generatorOptions:
+  disableNameSuffixHash: false
+
+secretGenerator:
+  - name: mysql
+    #behavior: merge
+    env: .env

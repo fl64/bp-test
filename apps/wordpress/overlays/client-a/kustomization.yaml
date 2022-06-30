@@ -14,3 +14,15 @@ images:
 patchesStrategicMerge:
   - deploy.env.patch.yaml
   - ingress.patch.yaml
+ # - secret.yaml
+
+generatorOptions:
+  disableNameSuffixHash: false
+
+secretGenerator:
+  - name: wordpress
+    behavior: merge
+    env: .env-wp
+  - name: wordpress-externaldb
+    behavior: merge
+    env: .env-db
