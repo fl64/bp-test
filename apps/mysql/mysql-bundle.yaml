@@ -25,64 +25,6 @@ data:
   wp1-pass: "d29yZHByZXNz"
   wp2-pass: "d29yZHByZXNz"
 ---
-# Source: mysql/templates/primary/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: bootstrap
-data:
-  bootstrap.sh: |-
-    #!/bin/bash -e
-
-    . /opt/bitnami/scripts/libmysql.sh
-
-    mysql_ensure_database_exists wp1
-    mysql_ensure_database_exists wp2
-
-    mysql_ensure_user_exists wp1 -p ${WP1_PASS}
-    mysql_ensure_user_exists wp2 -p ${WP2_PASS}
-
-    mysql_ensure_user_has_database_privileges wp1 wp1
-    mysql_ensure_user_has_database_privileges wp2 wp2
----
-# Source: mysql/templates/primary/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysql
-data:
-  my.cnf: |-
-    [mysqld]
-    default_authentication_plugin=mysql_native_password
-    skip-name-resolve
-    explicit_defaults_for_timestamp
-    basedir=/opt/bitnami/mysql
-    plugin_dir=/opt/bitnami/mysql/lib/plugin
-    port=3306
-    socket=/opt/bitnami/mysql/tmp/mysql.sock
-    datadir=/bitnami/mysql/data
-    tmpdir=/opt/bitnami/mysql/tmp
-    max_allowed_packet=16M
-    bind-address=0.0.0.0
-    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
-    log-error=/opt/bitnami/mysql/logs/mysqld.log
-    character-set-server=UTF8
-    collation-server=utf8_general_ci
-    slow_query_log=0
-    slow_query_log_file=/opt/bitnami/mysql/logs/mysqld.log
-    long_query_time=10.0
-
-    [client]
-    port=3306
-    socket=/opt/bitnami/mysql/tmp/mysql.sock
-    default-character-set=UTF8
-    plugin_dir=/opt/bitnami/mysql/lib/plugin
-
-    [manager]
-    port=3306
-    socket=/opt/bitnami/mysql/tmp/mysql.sock
-    pid-file=/opt/bitnami/mysql/tmp/mysqld.pid
----
 # Source: mysql/templates/primary/svc-headless.yaml
 apiVersion: v1
 kind: Service
@@ -153,15 +95,6 @@ spec:
                 secretKeyRef:
                   name: mysql
                   key: wp2-pass
-            # - name: MYSQL_USER
-            #   value: "wordpress"
-            # - name: MYSQL_PASSWORD
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: mysql
-            #       key: mysql-password
-            # - name: MYSQL_DATABASE
-            #   value: "wp1"
           envFrom:
           ports:
             - name: mysql

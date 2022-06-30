@@ -9,3 +9,11 @@ commonLabels:
 
 resources:
 - mysql-bundle.yaml
+
+configMapGenerator:
+  - name: mysql
+    files:
+      - my.cnf=cfg/my.cnf
+  - name: bootstrap
+    files:
+      - bootstrap.sh=cfg/bootstrap.sh
