@@ -1,0 +1,18 @@
+---
+# Source: wordpress/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wordpress
+spec:
+  rules:
+    - host: "wp02.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: wordpress
+                port:
+                  name: http

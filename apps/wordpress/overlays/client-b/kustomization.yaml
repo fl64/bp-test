@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: client-b
+
+resources:
+  - ../../base
+
+images:
+  - name: docker.io/bitnami/wordpress
+    newTag: 5.8.0
+
+patchesStrategicMerge:
+  - deploy.env.patch.yaml
+  - ingress.patch.yaml

@@ -182,7 +182,7 @@ metadata:
   name: wordpress
 spec:
   rules:
-    - host: "wp01.example.com"
+    - host: "wordpress.example.com"
       http:
         paths:
           - path: /
