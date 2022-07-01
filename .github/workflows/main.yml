@@ -27,6 +27,7 @@ jobs:
 
       - name: Kustomize Validate
         uses: bigwheel/kustomize-validate-action@v1
-
+        with:
+           path: apps/
       - name: Yaml lint
         uses: ibiqlik/action-yamllint@v3
